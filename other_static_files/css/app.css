@@ -1,0 +1,149 @@
+body {
+    font-family: Verdana, Geneva, sans-serif;
+    margin: 0;
+    min-width: 400px;
+}
+
+
+header h1 {
+    background: #5E6582;
+    color: #FFFFFF;
+    font-size: 1.5em;
+    margin: 0;
+    padding: 1em;
+}
+
+div#footer {
+    background: none repeat scroll 0 0 #5E6582;
+    color: #FFFFFF;
+    font-family: Georgia, serif;
+    font-size: 0.8em;
+    font-style: italic;
+    padding: 0.5em;
+}
+
+#main_menu {
+	position:relative;
+}
+
+ul#main_tabs {
+    background: none repeat scroll 0 0 #825e77;
+    display: block;
+    height: 40px;
+    margin: 0;
+    border-top: 1px solid grey;
+}
+
+ul#main_tabs li {
+    border-left: medium solid black;
+    display: block;
+    float: left;
+    font-weight: bold;
+    height: 32px;
+    list-style: none outside none;
+    padding: 8px 13px 0;
+    cursor:pointer;
+}
+
+ul#main_tabs li.selected {
+	color:white;
+	}
+
+ul#main_tabs li.last {
+	border-right: medium solid black;
+}
+
+div#main {
+	min-height: 400px
+}
+
+ul.list {
+    list-style: none outside none;
+    margin: 0;
+    padding: 10px 10px 5px 10px;
+}
+
+div.list_item_bar {
+    background: linear-gradient(to bottom, #EBE9F9 0%, #D8D0EF 50%, #CEC7EC 100%, #C1BFEA 100%) repeat scroll 0 0 transparent;
+    border: 1px solid lightgray;
+    border-radius: 6px 6px 6px 6px;
+    line-height: 40px;
+    margin-bottom: 5px;
+}
+
+span.item_title {
+    background: url("/static/img/item-collapsed.png") no-repeat scroll 15px 10px transparent;
+    display: inline-block;
+    font-size: 1.2em;
+    font-weight: bold;
+    padding-left: 50px;
+    vertical-align: middle;
+    cursor:pointer;
+}
+
+span.item_title.expanded {
+    background: url("/static/img/item-expanded.png") no-repeat scroll 15px 10px transparent;
+}
+
+span.item_authors {
+    color: #555555;
+    font-size: 0.8em;
+    font-style: italic;
+}
+
+div.progress_wheel {
+	background: url('/static/img/spinning-wheel.gif') no-repeat center center;
+	height:60px;
+}
+
+#list_footer #next, #list_footer #previous {
+	background: linear-gradient(to bottom, #EBE9F9 0%, #D8D0EF 50%, #CEC7EC 100%, #C1BFEA 100%) repeat scroll 0 0 transparent;
+    border: 1px solid lightgray;
+    border-radius: 6px 6px 6px 6px;
+    line-height: 40px;
+    width:40px;
+    display:block;
+    font-weight:bold;
+    padding-left:10px;
+    margin: 0px 10px;
+    cursor: pointer;
+}
+
+#list_footer #next {
+	float:right;
+}
+
+#list_footer #previous {
+	float: left;
+}
+
+#main_menu .search-field {
+    background-color: rgba(0, 0, 0, 0);
+    background-image: url("/static/img/search-icon.png");
+    background-position: 5px center;
+    background-repeat: no-repeat;
+    background-size: 24px 24px;
+    border: medium none;
+    cursor: pointer;
+    height: 30px;
+    margin: 3px 0;
+    padding: 0 0 0 34px;
+    position: absolute;
+    transition: width 400ms ease 0s, background 400ms ease 0s;
+    width: 0;
+    top:1px;
+    right:15px;
+    
+}
+
+#main_menu .search-field.expanded {
+    background-color: #FFFFFF;
+    border: 2px solid #C3C0AB;
+    cursor: text;
+    outline: 0 none;
+    width: 230px;
+}
+
+
+
+

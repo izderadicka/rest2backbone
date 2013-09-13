@@ -1,0 +1,71 @@
+{% load url from future %}
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Sample App</title>
+<script src="{{STATIC_URL}}js/jquery-2.0.2.js"></script>
+<script  src="{% url 'django.views.i18n.javascript_catalog'  packages='rest2backbone'%}"></script>
+<script  src="{{STATIC_URL}}js/underscore-min.js"></script>
+<script  src="{{STATIC_URL}}js/backbone-min.js"></script>
+<script src="{% url 'sample-api' %}"></script>
+<script  src="{{STATIC_URL}}js/app.js"></script>
+<link rel="stylesheet" href="{{STATIC_URL}}css/app.css">
+</head>
+<body>
+<header>
+<div id="header">
+<h1>Sample application for Backbone.js with Django REST Framework</h1>
+<div id="main_menu">
+<nav>
+<ul id="main_tabs">
+<li id="publishers_tab">Publishers</li>
+<li id="authors_tab">Authors</li>
+<li id="books_tab" class="last">Books</li>
+</ul>
+</nav>
+<input class="search-field" type="search" title="Enter search sring and press Enter" 
+name="q" value="" placeholder="Search …">
+</div>
+</div>
+</header>
+<section>
+<div id=main></div>
+</section>
+<footer><div id="footer">
+A footer
+</div></footer>
+<script type="text/template" id="general_list">
+<ul class="list"></ul>
+<div id="list_footer">
+<% if (previousPage) { %>
+<a id="previous">&lt;&lt;</a>
+<% } %>
+<% if (nextPage) { %>
+<a id="next" >&gt;&gt;</a>
+<% } %>
+</div>
+</script>
+<script type="text/template" id="publisher_list_item">
+<li data-pk="<%= id %>" class="list_item">
+<div class="list_item_bar">
+<span class="item_title"><%= name %></span>
+</div>
+</li>
+</script>
+<script type="text/template" id="author_list_item">
+<li data-pk="<%= id %>" class="list_item">
+<div class="list_item_bar">
+<span class="item_title"><%= last_name %><% if (first_name) { print(', '+first_name) }%></span>
+</div>
+</li>
+</script>
+<script type="text/template" id="book_list_item">
+<li data-pk="<%= id %>" class="list_item">
+<div class="list_item_bar">
+<span class="item_title"><%= title %><span class="item_authors"> by <%= author_names.join('; ')%></span></span>
+</div>
+</li>
+</script>
+</body>
+</html>
