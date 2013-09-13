@@ -1,0 +1,4 @@
+*.pyc
+/django_filters
+/rest_framework
+*~
