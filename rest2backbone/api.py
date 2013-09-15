@@ -6,11 +6,30 @@ Created on Sep 9, 2013
 
 from django.template.loader import render_to_string
 import json
-from django.utils.safestring import SafeString
+from django.utils.safestring import mark_safe
 
+class RouterAdapter(object):
+    def __init__(self, router):
+        self.registry_iter=iter(router.registry)
+            
+    def _get_model_name(self, view):
+        model_cls = getattr(view, 'model', None)
+        queryset = getattr(view, 'queryset', None)
+        if model_cls is None and queryset is not None:
+            model_cls = queryset.model
+        assert model_cls
+        return model_cls._meta.object_name
+    
+    def next(self):
+        url, view_set, _name = next(self.registry_iter)
+        return self._get_model_name(view_set), view_set().get_serializer_class(), url
+    
+    def __iter__(self):
+        return self
+        
 
 class Field(object):
-    _attrs=['type_label', 'read_only', 'default', 'max_length', 'min_length', 'min_value', 'max_value' ]
+    _attrs=['type_label', 'read_only', 'default', 'max_length', 'min_length', 'min_value', 'max_value', 'required' ]
     _map={'type_label':'type'}
     
     def __init__(self, name, ser_field):
@@ -43,7 +62,7 @@ class Model(object):
         def fn(o,f):  
             o[f.name]= f.attributes        
             return o 
-        return SafeString(json.dumps(reduce(fn , self.fields, {})))
+        return mark_safe(json.dumps(reduce(fn , self.fields, {})))
     
     def toJS(self):
         return render_to_string('rest2backbone/api-model.js', {'m':self})
@@ -60,34 +79,23 @@ class Collection(object):
         return render_to_string('rest2backbone/api-collection.js', {'c':self})
         
         
-class ModelLister(object):
+class ModelMaker(object):
     def __init__(self, router=None, url_prefix=None):
         self.url_prefix=url_prefix or ''
         self._models =[]
         self._collections=[]
         if router:
             self._list_router(router)
-    
+            
     def _list_router(self, router):
-        for url, view_set, _name in router.registry:
-            name=self._get_model_name(view_set)
-            self.add_model(name, view_set().get_serializer_class(), url)
+        for name, serializer_class, url in RouterAdapter(router):
+            self.add_model(name, serializer_class, url)
             
     def add_model(self,name, serializer_class, url, no_collection=False):
             model= Model(name, serializer_class, url, self.url_prefix)
             self._models.append(model)
             if not no_collection:
                 self._collections.append(Collection(model))
-            
-            
-    def _get_model_name(self, view):
-        model_cls = getattr(view, 'model', None)
-        queryset = getattr(view, 'queryset', None)
-        if model_cls is None and queryset is not None:
-            model_cls = queryset.model
-        assert model_cls
-        return model_cls._meta.object_name
-        
         
     @property    
     def models(self):

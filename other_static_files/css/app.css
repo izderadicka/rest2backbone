@@ -20,6 +20,7 @@ div#footer {
     font-size: 0.8em;
     font-style: italic;
     padding: 0.5em;
+    margin-top: 50px;
 }
 
 #main_menu {
@@ -144,6 +145,41 @@ div.progress_wheel {
     width: 230px;
 }
 
+div.r2b_form_ro {
+    border: medium dotted lightblue;
+    margin: 10px 20px;
+    padding: 10px 15px;
+    position:relative;
+}
 
+div.r2b_field_row {
+    clear: both;
+}
 
+label.t2b_field_label:after {
+    content: ":";
+}
 
+label.t2b_field_label {
+    float: left;
+    width: 200px;
+}
+
+label.t2b_field_label.required {
+    font-weight: bold;
+}
+
+div.r2b_field {
+    min-height: 1.3em;
+}
+
+div.r2b_edit_form_btn {
+    background: none repeat scroll 0 0 lightblue;
+    border: 2px solid lightgrey;
+    font-weight: bold;
+    position: absolute;
+    right: 10px;
+    text-align: center;
+    top: 10px;
+    width: 5em;
+}

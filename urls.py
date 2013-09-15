@@ -14,6 +14,7 @@ router.register('book', BookView)
 router.register('publisher', PublisherView)
 
 from rest2backbone.views import restApi
+from rest2backbone.forms import FormFactory
 
 urlpatterns = patterns('',
     # Examples:
@@ -24,7 +25,7 @@ urlpatterns = patterns('',
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Uncomment the next line to enable the admin:
-     url(r'^/?$', TemplateView.as_view(template_name='sample/app.html')),
+     url(r'^/?$', TemplateView.as_view(template_name='sample/app.html'), {'forms': FormFactory(router)}),
      url(r'^js-locale/(?P<packages>\S+?)/?$', 'django.views.i18n.javascript_catalog'),
      url(r'^js-restAPI/?$', restApi.as_view(), {'router': router, 'url_prefix':'/api'}, name='sample-api'),
      url(r'^api/', include(router.urls)),

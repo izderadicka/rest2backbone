@@ -44,7 +44,7 @@ class PublisherView(viewsets.ModelViewSet):
     
     
 class BookSerializer(serializers.ModelSerializer):
-    author_names=serializers.RelatedField(source='authors', many=True)
+    author_names=serializers.RelatedField(source='authors', many=True, label="Authors")
     class Meta:
         model=Book
 

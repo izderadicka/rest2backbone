@@ -91,10 +91,22 @@ var BaseListView = BaseView.extend({
 
 // app views
 
+var DetailView = BaseView.extend({
+	render: function() {
+		BaseView.prototype.render.apply(this, arguments);
+		this.$el.find('div.r2b_form_ro').append($('<div>').html('Edit').addClass('r2b_edit_form_btn'));
+	}
+})
+
+var PublisherView= DetailView.extend({
+	template:'#r2b_template_publisher_ro'
+});
+
 var PublishersListView=BaseListView.extend({
 	
 	id:"publishers_section",
 	templateItem:'#publisher_list_item',
+	detailViewClass:PublisherView,
 	
 	
 	render: function() {
@@ -105,6 +117,10 @@ var PublishersListView=BaseListView.extend({
 	
 });
 
+var AuthorView= DetailView.extend({
+	template:'#r2b_template_author_ro'
+});
+
 var AuthorsListView=BaseListView.extend({
 	tagName:'div',
 	className:'list_section',
@@ -112,11 +128,16 @@ var AuthorsListView=BaseListView.extend({
 	parent:'div#main',
 	template:'#general_list',
 	templateItem:'#author_list_item',
+	detailViewClass:AuthorView,
 	
 	render: function() {
 		BaseListView.prototype.render.apply(this, arguments);
 		toggleMainMenu('author');
 	}
+});
+
+var BookView= DetailView.extend({
+	template:'#r2b_template_book_ro'
 });
 
 var BooksListView=BaseListView.extend({
@@ -126,6 +147,7 @@ var BooksListView=BaseListView.extend({
 	parent:'div#main',
 	template:'#general_list',
 	templateItem:'#book_list_item',
+	detailViewClass: BookView,
 	
 	render: function() {
 		BaseListView.prototype.render.apply(this, arguments);
