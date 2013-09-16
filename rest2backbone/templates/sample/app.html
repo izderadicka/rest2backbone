@@ -3,6 +3,7 @@
 <html>
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width; initial-scale=1.0">
 <title>Sample App</title>
 <script src="{{STATIC_URL}}js/jquery-2.0.2.js"></script>
 <script  src="{% url 'django.views.i18n.javascript_catalog'  packages='rest2backbone'%}"></script>
@@ -16,16 +17,17 @@
 <header>
 <div id="header">
 <h1>Sample application for Backbone.js with Django REST Framework</h1>
+<input class="search-field" type="search" title="Enter search sring and press Enter" 
+name="q" value="" placeholder="Search …">
 <div id="main_menu">
 <nav>
 <ul id="main_tabs">
+<li id=add_new"><img src="/static/img/plus.png"></li>
 <li id="publishers_tab">Publishers</li>
 <li id="authors_tab">Authors</li>
-<li id="books_tab" class="last">Books</li>
+<li id="books_tab">Books</li>
 </ul>
 </nav>
-<input class="search-field" type="search" title="Enter search sring and press Enter" 
-name="q" value="" placeholder="Search …">
 </div>
 </div>
 </header>

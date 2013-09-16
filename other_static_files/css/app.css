@@ -1,7 +1,7 @@
 body {
     font-family: Verdana, Geneva, sans-serif;
     margin: 0;
-    min-width: 400px;
+    min-width: 320px;
 }
 
 
@@ -33,6 +33,7 @@ ul#main_tabs {
     height: 40px;
     margin: 0;
     border-top: 1px solid grey;
+    padding: 0;
 }
 
 ul#main_tabs li {
@@ -50,12 +51,17 @@ ul#main_tabs li.selected {
 	color:white;
 	}
 
-ul#main_tabs li.last {
+ul#main_tabs li:last-child {
 	border-right: medium solid black;
 }
 
+ul#main_tabs li:FIRST-CHILD {
+	border-left: none;
+}
+
+
 div#main {
-	min-height: 400px
+	min-height: 50px
 }
 
 ul.list {
@@ -68,18 +74,25 @@ div.list_item_bar {
     background: linear-gradient(to bottom, #EBE9F9 0%, #D8D0EF 50%, #CEC7EC 100%, #C1BFEA 100%) repeat scroll 0 0 transparent;
     border: 1px solid lightgray;
     border-radius: 6px 6px 6px 6px;
-    line-height: 40px;
     margin-bottom: 5px;
 }
 
+.item_content {
+    overflow: hidden;
+
+}
+
 span.item_title {
-    background: url("/static/img/item-collapsed.png") no-repeat scroll 15px 10px transparent;
-    display: inline-block;
+    background: url("/static/img/item-collapsed.png") no-repeat scroll 15px 4px transparent;
     font-size: 1.2em;
     font-weight: bold;
     padding-left: 50px;
     vertical-align: middle;
     cursor:pointer;
+    margin-top: 10px;
+    min-height: 2em;
+    display:block;
+    
 }
 
 span.item_title.expanded {
@@ -118,26 +131,27 @@ div.progress_wheel {
 	float: left;
 }
 
-#main_menu .search-field {
+.search-field {
     background-color: rgba(0, 0, 0, 0);
     background-image: url("/static/img/search-icon.png");
     background-position: 5px center;
     background-repeat: no-repeat;
     background-size: 24px 24px;
-    border: medium none;
+    border: 2px solid white;
+    border-radius: 4px 4px 4px 4px;
+    box-shadow: 2px 2px 10px white;
     cursor: pointer;
     height: 30px;
-    margin: 3px 0;
+    margin: 15px 0;
     padding: 0 0 0 34px;
     position: absolute;
+    right: 15px;
+    top: 1px;
     transition: width 400ms ease 0s, background 400ms ease 0s;
     width: 0;
-    top:1px;
-    right:15px;
-    
 }
 
-#main_menu .search-field.expanded {
+.search-field.expanded {
     background-color: #FFFFFF;
     border: 2px solid #C3C0AB;
     cursor: text;
@@ -145,10 +159,10 @@ div.progress_wheel {
     width: 230px;
 }
 
-div.r2b_form_ro {
+div.r2b_form_ro, div.r2b_form {
     border: medium dotted lightblue;
     margin: 10px 20px;
-    padding: 10px 15px;
+    padding: 12px 15px 10px;
     position:relative;
 }
 
@@ -158,11 +172,13 @@ div.r2b_field_row {
 
 label.t2b_field_label:after {
     content: ":";
+    
 }
 
 label.t2b_field_label {
     float: left;
-    width: 200px;
+    width: 150px;
+    font-style: italic !important;
 }
 
 label.t2b_field_label.required {
@@ -173,13 +189,26 @@ div.r2b_field {
     min-height: 1.3em;
 }
 
-div.r2b_edit_form_btn {
+div.r2b_top_form_btn, div.r2b_form_btn {
     background: none repeat scroll 0 0 lightblue;
     border: 2px solid lightgrey;
     font-weight: bold;
+    text-align: center;
+    top: -12px;
+    width: 5em;
+    cursor: pointer;
+}
+
+div.r2b_top_form_btn {
+    
     position: absolute;
     right: 10px;
-    text-align: center;
-    top: 10px;
-    width: 5em;
+    top: -12px;
+   
+}
+
+div.r2b_form_btn {
+    
+    margin:15px 0px 5px 150px;
+   
 }

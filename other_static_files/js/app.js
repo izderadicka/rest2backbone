@@ -1,3 +1,5 @@
+
+//books application
 var booksApp=function() {
 
 // main collections
@@ -62,15 +64,18 @@ var BaseListView = BaseView.extend({
 		 pk=parseInt(item.attr('data-pk'));
 		if (title.hasClass('expanded')) {
 			title.removeClass('expanded');
-			item.find('div.item_content').remove();
+			var div=item.find('div.item_content').animate({height:0}, function(){this.remove()});
 		} else {
 			title.addClass('expanded')
 			var div=$('<div>').addClass('item_content').appendTo(item)
-			   .append($('<div>').attr('class', 'progress_wheel'));
+//			   .append($('<div>').attr('class', 'progress_wheel'));
 			if (this.detailViewClass) {
 				var view=new this.detailViewClass({model:this.model.get(pk)});
 				view.parent=div;
 				view.render();
+				//animation
+				var h= div.height();
+				div.height(0).animate({height:h});
 			}
 		}
 	},
@@ -94,12 +99,48 @@ var BaseListView = BaseView.extend({
 var DetailView = BaseView.extend({
 	render: function() {
 		BaseView.prototype.render.apply(this, arguments);
-		this.$el.find('div.r2b_form_ro').append($('<div>').html('Edit').addClass('r2b_edit_form_btn'));
+		this.$el.find('div.r2b_form_ro').append($('<div>').html('Edit').addClass('r2b_top_form_btn')
+				.attr('id', 'r2b_edit_btn'));
+		return this;
+	},
+	
+	events: {"click #r2b_edit_btn": 'renderEdit',
+		      "click #r2b_view_btn": 'reRender',
+		      "click #r2b_save_btn": 'saveModel'},
+	
+	renderEdit: function() {
+		this.$el.html(compileTemplate(this.templateEdit)(this.model.attributes))
+		$(this.parent).html(this.$el).height('auto') ;
+		
+		this.$el.find('div.r2b_form').append($('<div>').html('View').addClass('r2b_top_form_btn')
+				.attr('id', 'r2b_view_btn'));
+		this.$el.find('div.r2b_form').append($('<div>').html('Save').addClass('r2b_form_btn')
+				.attr('id', 'r2b_save_btn'));
+		
+		this.delegateEvents();
+		return this
+	},
+	
+	saveModel: function() {
+		var dirty=this.model.updateFromForm(this.$el)
+		if (dirty) {
+			//not very efficient - should just rerender current item only
+			this.model.save();
+			this.model.once('sync', function() {app.currentView.reRender()});
+			
+			
+			};
 	}
+	
+		      
+		      
+
 })
 
 var PublisherView= DetailView.extend({
-	template:'#r2b_template_publisher_ro'
+	template:'#r2b_template_publisher_ro',
+	templateEdit: '#r2b_template_publisher'
+		
 });
 
 var PublishersListView=BaseListView.extend({
@@ -118,7 +159,8 @@ var PublishersListView=BaseListView.extend({
 });
 
 var AuthorView= DetailView.extend({
-	template:'#r2b_template_author_ro'
+	template:'#r2b_template_author_ro',
+	templateEdit:'#r2b_template_author'
 });
 
 var AuthorsListView=BaseListView.extend({
@@ -137,7 +179,8 @@ var AuthorsListView=BaseListView.extend({
 });
 
 var BookView= DetailView.extend({
-	template:'#r2b_template_book_ro'
+	template:'#r2b_template_book_ro',
+	templateEdit:'#r2b_template_book'
 });
 
 var BooksListView=BaseListView.extend({
@@ -241,19 +284,24 @@ var App=Backbone.Router.extend({
 	listBooks: listAction('books', restAPI.BookList, BooksListView)
 });
 
-//start application
+//create application
 
 var app=new App();
 app.doSearch=doSearch;
 return app;
 }();
 
+
+//when page loads
 $(function(){
 
+//start routing
 Backbone.history.start();
 if (! Backbone.history.fragment) {
 	booksApp.navigate('publisher', {trigger:true});
 }
+
+//bind main navigation and search events
 $('#publishers_tab').click(function(evt) {booksApp.navigate('publisher', {trigger:true})});
 $('#authors_tab').click(function(evt) {booksApp.navigate('author', {trigger:true})});
 $('#books_tab').click(function(evt) {booksApp.navigate('book', {trigger:true})});
@@ -263,6 +311,8 @@ $('.search-field').keypress(function(event) {
 		booksApp.doSearch($(this).val())
 	}
 	});
+
+
 //UI Tweaks
 $('.search-field').focus(function(){$(this).addClass('expanded')})
 				  .blur(function(){if (!$(this).val()) {$(this).removeClass('expanded')}});

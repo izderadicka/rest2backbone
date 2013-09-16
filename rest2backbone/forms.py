@@ -10,32 +10,52 @@ import copy
 from django.utils.safestring import mark_safe
 from django.utils.encoding import StrAndUnicode
 from django.template.loader import render_to_string
+import widgets
 
 
 class Field(StrAndUnicode):
     _attrs=['read_only', 'fields', 'label', 'widget', 'required', 'choices', 'regexp', 'help_text']
-    def __init__(self, name, ser_field, ro_class='r2b_field_value_ro'):
+    def __init__(self, name, ser_field, auto_id="id_%s", ro_class='r2b_field_value_ro'):
         self.name=name
         self.ro_class=ro_class
         self.force_ro=False
+        self.auto_id=auto_id
         for atr in self._attrs:
             if hasattr(ser_field, atr):
                 if atr in ('widget',):
-                    setattr(self, atr, copy.deepcopy(getattr(ser_field, atr)))
+                    setattr(self, atr, self._get_widget(getattr(ser_field, atr)))
                 else:
                     setattr(self, atr, getattr(ser_field, atr))
             else:
                 setattr(self, atr, None)
+        # widget must be supplied        
+        assert self.widget
+                
+    def _get_widget(self, widget):
+        if isinstance(widget, type):
+            widget=()
+        else:
+            widget=copy.deepcopy(widget)
+        #monkey patch to adapt to template rendering
+        if not hasattr(widget, 'render_template'):
+            widgets.patch(widget)    
+        return widget
+        
                     
     def render_ro(self):
         return mark_safe(u'<span id="id_'+self.name+'" class="'+self.ro_class+'"><%= '+self.name+' %></span>')
     
     def label_tag(self):
         req=u' class="required"' if self.required else ''
-        return mark_safe(u'<label for="id_'+self.name+'"'+req+'>'+(self.label or self.name)+'</label>')
+        id=self.auto_id % self.name
+        return mark_safe(u'<label for="'+id+'"'+req+'>'+(self.label or self.name)+'</label>')
     
     def render(self):
-        pass
+        attrs={}
+        attrs['id']=self.auto_id%self.name
+        assert hasattr(self.widget, 'render_template') # widget was patched
+        return mark_safe(self.widget.render_template(self.name, attrs))
+        
     
     def __unicode__(self):
         if self.force_ro:
@@ -67,13 +87,20 @@ class Form(object):
             fields=[copy.copy(f) for m,f in self._fields.iteritems() if (not f.read_only and not f.fields)]
         return fields
     
+    def get(self, name):
+        return self._fields.get(name)
+    
     def render_ro(self):
         self.force_ro=True
         try:
             res=render_to_string(self.template_name_ro, {'form':self})
-            return res
+            return mark_safe(res)
         finally:    
             self.force_ro=False
+            
+    def render(self):
+            res=render_to_string(self.template_name, {'form':self})
+            return mark_safe(res)
         
         
 
@@ -103,13 +130,21 @@ class FormFactory(object):
     def forms(self):
         return self._forms.values()
     
+    def get(self, name):
+        return self._forms.get(name)
+    
     def render_all(self, read_only=True):
         res=[]
         for f in self.forms:
+            res.append(u'<script type="text/template" id="r2b_template_%s">'% f.name.lower())
+            res.append(f.render())
+            res.append(u'</script>')
             if read_only:
                 res.append(u'<script type="text/template" id="r2b_template_%s_ro">'% f.name.lower())
                 res.append(f.render_ro())
                 res.append(u'</script>')
+                
+            
                 
         return mark_safe(u'\n'.join(res))
             

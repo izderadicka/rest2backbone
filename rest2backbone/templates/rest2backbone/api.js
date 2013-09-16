@@ -18,11 +18,11 @@ var restAPI= function() {
 			Backbone.Collection.apply(this, arguments);
 		},
 		
-		initialize: function() {
-			this.on('error', function(model, xhr, options) {
-				alert('Server Error: '+xhr.status + ' - '+xhr.statusText);
-			});
-		},
+//		initialize: function() {
+//			this.on('error', function(model, xhr, options) {
+//				alert('Server Error on Collection: '+xhr.status + ' - '+xhr.statusText);
+//			});
+//		},
 		
 		url: function() {
 			var qs=[];
@@ -83,7 +83,7 @@ var restAPI= function() {
 		
 		initialize: function() {
 			this.on('error', function(model, xhr, options) {
-				alert('Server Error: '+xhr.status + ' - '+xhr.statusText);
+				alert('Server Error on Model: '+xhr.status + ' - '+xhr.statusText);
 			});
 		},
 		
@@ -118,24 +118,57 @@ var restAPI= function() {
 			};
 			
 			var dirty=false;
-			for (key in this.attributes) {
-				var readOnly=[this.idAttribute, 'instance_url'];
+			var diff=function(old, newer) {
+				
+				var compareArrays= function(a1,a2) {
+				    
+				    if (!a1 || !a2)
+				        return false;
+				    if (a1.length !== a2.length)
+				        return false;
+
+				    for (var i = 0; i < a1.length; i++) {
+				        if (_.isArray(a1[i]) && _.isArray(a2[i])) {
+				            if ( !compareArrays(a1[i],a2[i]))
+				                return false;
+				        }
+				        else if (a1[i] != a2[i]) {
+				            return false;
+				        }
+				    }
+				    return true;
+				};
+				
+				return old && newer && !(old==newer  || _.isArray(old) && compareArrays(old, newer))
+			};
+			for (var key in this.attributes) {
+				var readOnly=this.readOnly();
 				if (readOnly.indexOf(key)>=0) {
 					continue;
 				}
-				var input=$el.find('input[name="'+key+'"]');
-				if (! input) {
+				var input=$el.find('input[name="'+key+'"], select[name="'+key+'"]');
+				if (input.length<1) {
 					throw "Input for attribute " + key+ " is missing";
 				}
 				
 				var newVal=getVal(input);
-				if (this.get(key) !== newVal) {
+				if (diff(this.get(key), newVal)) {
 				this.set(key, newVal);
 				dirty=true;
 				}
 			}
 			
 			return dirty;
+		},
+		
+		readOnly: function() {
+			var ro=[];
+			for (var name in this.fields) {
+				if (this.fields[name].read_only) {
+					ro.push(name)
+				}
+			};
+			return ro;
 		}
 		
 	});

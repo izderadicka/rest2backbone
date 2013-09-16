@@ -12,6 +12,8 @@ import json
 from django.test.utils import override_settings
 from models import Author
 
+from tests2 import  *
+
 def find_pos(list, name):
     for i in range(len(list)):
         if list[i].name==name:
@@ -173,22 +175,9 @@ class TestApiJS(unittest.TestCase):
         for m in lister.models:
             self.assertTrue(m.fields_json().startswith('{'))
             
-class TestForms(unittest.TestCase):
-    def test_ro(self):
-        from urls import router
-        ff=FormFactory(router)
-        for f in ff.forms:
-            self.assertTrue(f.name)
-            html=f.render_ro()
-            self.assertTrue(len(html)>50)
-            
-    def test_all(self):  
-        from urls import router
-        ff=FormFactory(router)
-        templates=ff.render_all()
-        self.assertTrue(len(templates), 500)
+
 
 
 if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'Test.testApi']
+    import sys;sys.argv = ['', 'TestForms.test_render']
     unittest.main()
