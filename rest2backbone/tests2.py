@@ -53,7 +53,7 @@ class TestForms(test.TestCase):
         self.assertTrue(publisher_html.find('PublisherIndex')>0)
         authors=book.get('authors')
         authors_html=authors.render()
-        self.assertTrue(authors_html.find('option')>0)
+        self.assertTrue(authors_html.find('select')>0)
         print publisher_html
         print authors_html
         
