@@ -6,9 +6,8 @@ from django.contrib import admin
 from django.views.generic.base import TemplateView
 admin.autodiscover()
 
-from rest_framework import routers
-from rest2backbone.resources import AuthorView, BookView, PublisherView
-router=routers.DefaultRouter(trailing_slash=False)
+from rest2backbone.resources import AuthorView, BookView, PublisherView, IndexedRouter
+router=IndexedRouter(trailing_slash=False)
 router.register('author', AuthorView)
 router.register('book', BookView)
 router.register('publisher', PublisherView)
@@ -27,7 +26,7 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
      url(r'^/?$', TemplateView.as_view(template_name='sample/app.html'), {'forms': FormFactory(router)}),
      url(r'^js-locale/(?P<packages>\S+?)/?$', 'django.views.i18n.javascript_catalog'),
-     url(r'^js-restAPI/?$', restApi.as_view(), {'router': router, 'url_prefix':'/api'}, name='sample-api'),
+     url(r'^js-restAPI/?$', restApi.as_view(), {'router': router, 'url_prefix':'/api'}, name='rest-api'),
      url(r'^api/', include(router.urls)),
      url(r'^admin/', include(admin.site.urls)),
      url(r'^api-auth/', include('rest_framework.urls',

@@ -9,7 +9,8 @@
 <script  src="{% url 'django.views.i18n.javascript_catalog'  packages='rest2backbone'%}"></script>
 <script  src="{{STATIC_URL}}js/underscore-min.js"></script>
 <script  src="{{STATIC_URL}}js/backbone-min.js"></script>
-<script src="{% url 'sample-api' %}"></script>
+<script src="{% url 'rest-api' %}"></script>
+<script  src="{{STATIC_URL}}js/api-forms.js"></script>
 <script  src="{{STATIC_URL}}js/app.js"></script>
 <link rel="stylesheet" href="{{STATIC_URL}}css/app.css">
 </head>
@@ -22,7 +23,7 @@ name="q" value="" placeholder="Search …">
 <div id="main_menu">
 <nav>
 <ul id="main_tabs">
-<li id=add_new"><img src="/static/img/plus.png"></li>
+<li id="add_new"><img src="/static/img/plus.png"></li>
 <li id="publishers_tab">Publishers</li>
 <li id="authors_tab">Authors</li>
 <li id="books_tab">Books</li>
@@ -47,6 +48,13 @@ A footer
 <a id="next" >&gt;&gt;</a>
 <% } %>
 </div>
+</script>
+<script type="text/template" id="new_list_item">
+<li  class="list_item new">
+<div class="list_item_bar">
+<span class="item_title expanded new">&lt;New <%= name %>&gt;</span>
+</div>
+</li>
 </script>
 <script type="text/template" id="publisher_list_item">
 <li data-pk="<%= id %>" class="list_item">

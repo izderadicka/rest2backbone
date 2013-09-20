@@ -77,6 +77,15 @@ class Collection(object):
         
     def toJS(self):
         return render_to_string('rest2backbone/api-collection.js', {'c':self})
+    
+class Index(Collection):
+    def __init__(self,model):
+        self.url=model.url+'-index'
+        self.name=model.name+'Index'
+        self.model_name= model.name
+        
+    def toJS(self):
+        return render_to_string('rest2backbone/api-index.js', {'c':self})
         
         
 class ModelMaker(object):
@@ -84,6 +93,7 @@ class ModelMaker(object):
         self.url_prefix=url_prefix or ''
         self._models =[]
         self._collections=[]
+        self._indexes=[]
         if router:
             self._list_router(router)
             
@@ -91,11 +101,13 @@ class ModelMaker(object):
         for name, serializer_class, url in RouterAdapter(router):
             self.add_model(name, serializer_class, url)
             
-    def add_model(self,name, serializer_class, url, no_collection=False):
+    def add_model(self,name, serializer_class, url, no_collection=False, no_index=False):
             model= Model(name, serializer_class, url, self.url_prefix)
             self._models.append(model)
             if not no_collection:
                 self._collections.append(Collection(model))
+            if not no_index:
+                self._indexes.append(Index(model))
         
     @property    
     def models(self):
@@ -104,12 +116,19 @@ class ModelMaker(object):
     def collections(self):
         return self._collections
     
+    @property
+    def indexes(self):
+        return self._indexes
+    
+    
     def toJS(self):
         objects=[]
         for m in self.models:
             objects.append(m.toJS())
         for c in self.collections:
             objects.append(c.toJS())
+        for i in self.indexes:
+            objects.append(i.toJS())
         
             
         return '\n'.join(objects)

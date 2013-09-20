@@ -1,8 +1,8 @@
 {% load rest_framework %}
-<div id="id_form_{{form.name|lower}}_ro" class="r2b_form_ro">
+<div id="{{form.id}}_ro" class="r2b_form_ro">
 {% for f in form.fields %}
 <div class="r2b_field_row">
-{{f.label_tag|add_class:"t2b_field_label"}}
+{{f.label_tag|add_class:"r2b_field_label"}}
 <div class="r2b_field">{{f}}</div>
 </div>
 {%endfor%}

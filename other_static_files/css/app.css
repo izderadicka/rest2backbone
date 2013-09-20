@@ -170,18 +170,18 @@ div.r2b_field_row {
     clear: both;
 }
 
-label.t2b_field_label:after {
+label.r2b_field_label:after {
     content: ":";
     
 }
 
-label.t2b_field_label {
+label.r2b_field_label {
     float: left;
     width: 150px;
     font-style: italic !important;
 }
 
-label.t2b_field_label.required {
+label.r2b_field_label.required {
     font-weight: bold;
 }
 
@@ -211,4 +211,33 @@ div.r2b_form_btn {
     
     margin:15px 0px 5px 150px;
    
+}
+
+ul.r2b_errors {
+    color: #FF0000;
+    font-weight: bold;
+    list-style: none outside none;
+    margin: 0;
+    padding: 0;
+}
+
+ul.r2b_errors > li {
+    background: url("/static/img/error.png") no-repeat scroll 0 0 transparent;
+    line-height: 20px;
+    margin-bottom: 5px;
+    padding-left: 30px;
+}
+
+label.error {
+    color: #FF0000;
+}
+
+div.r2b_progress-small {
+    background: url("/static/img/spinning-wheel.gif") no-repeat scroll 0 5px / 16px 16px transparent;
+    float: left;
+    height: 20px;
+    width: 16px;
+}
+.r2b_field select {
+    float: left;
 }

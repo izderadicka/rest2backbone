@@ -7,6 +7,7 @@ import unittest
 import api
 from rest2backbone.forms import FormFactory
 from rest_framework import test as api_test
+from rest_framework import settings as api_settings
 import types
 import json
 from django.test.utils import override_settings
@@ -41,6 +42,11 @@ REST_FRAMEWORK_TEST = {
         
 class TestApi(api_test.APITestCase):   
     fixtures=['test_data.json']
+    
+    def reload_settings(self):
+        from django.conf import settings
+        api_settings.api_settings =api_settings.APISettings(getattr(settings, 'REST_FRAMEWORK', None), 
+                                    api_settings.DEFAULTS, api_settings.IMPORT_STRINGS)
         
     def test_browse(self):
         publishers=to_json(self.client.get('/api/publisher'))
@@ -69,7 +75,8 @@ class TestApi(api_test.APITestCase):
      
     @override_settings(REST_FRAMEWORK=REST_FRAMEWORK_TEST)    
     def test_paging(self):
-        books=to_json(self.client.get('/api/book'))
+        self.reload_settings()
+        books=to_json(self.client.get('/api/book?page_size=2'))
         self.assertEqual(books['count'], 6)
         pages=1
         while books['next']:
@@ -80,10 +87,12 @@ class TestApi(api_test.APITestCase):
         
     @override_settings(REST_FRAMEWORK=REST_FRAMEWORK_TEST)       
     def test_filters(self):
+        self.reload_settings()
         publishers=to_json(self.client.get('/api/publisher?q=press'))
         self.assertEqual(publishers['count'], 2)
-        
-        books=to_json(self.client.get('/api/book?page=2&q=a'))
+        from django.conf import settings
+        self.assertEqual(settings.REST_FRAMEWORK.get('PAGINATE_BY'), 2)
+        books=to_json(self.client.get('/api/book?page=2&&page_size=2&q=a'))
         self.assertEqual(books['count'], 4)
         self.assertTrue(not books['next'])
         
@@ -131,7 +140,36 @@ class TestApi(api_test.APITestCase):
         except ServerError, e:
             self.assertEqual(e.code, 404)
             
-       
+    def test_indexes(self):
+        index_authors=to_json(self.client.get('/api/author-index'))
+        self.assertEqual(index_authors['count'], 5)
+        a1=index_authors['results'][0]
+        self.assertEqual(len(a1), 2)
+        self.assertTrue(a1['id'])
+        self.assertTrue(a1['name'])
+        print index_authors
+        found=False
+        for a in index_authors['results']:
+            if a['name']=='Dark, Jason':
+                found=True
+        self.assertTrue(found)
+        
+        index_books=to_json(self.client.get('/api/book-index'))
+        self.assertEqual(index_books['count'], 6)
+        index_publishers=to_json(self.client.get('/api/publisher-index'))
+        self.assertEqual(index_publishers['count'], 3)
+        print index_publishers
+            
+class TestRouter(unittest.TestCase):   
+    
+    def test_indexes(self):
+        from urls import router
+        urls=router.get_urls()  
+        has_indexes=False
+        for u in urls:
+            if u.name.find('-index')>0:
+                has_indexes=True
+        self.assertTrue(has_indexes)
      
 
 class TestApiJS(unittest.TestCase):

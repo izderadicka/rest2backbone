@@ -1,3 +1,38 @@
+//set CSRF support
+
+(function () {
+	function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+};
+
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+};
+
+$.ajaxSetup({
+    crossDomain: false, 
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type)) {
+            xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        }
+    }
+});
+})();
+
+
 var restAPI= function() {
 	var api={};
 	
@@ -83,7 +118,11 @@ var restAPI= function() {
 		
 		initialize: function() {
 			this.on('error', function(model, xhr, options) {
+				if (xhr.status==400 && xhr.responseJSON && ! $.isEmptyObject(xhr.responseJSON)) {
+					this.trigger('rejected', xhr.responseJSON)
+				} else {
 				alert('Server Error on Model: '+xhr.status + ' - '+xhr.statusText);
+				}
 			});
 		},
 		
@@ -139,7 +178,12 @@ var restAPI= function() {
 				    return true;
 				};
 				
-				return old && newer && !(old==newer  || _.isArray(old) && compareArrays(old, newer))
+				// to have null == ''
+				if (!old && !newer) {
+					return false
+				}
+				
+				return !(old==newer  || _.isArray(old) && compareArrays(old, newer))
 			};
 			for (var key in this.attributes) {
 				var readOnly=this.readOnly();

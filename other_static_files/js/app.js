@@ -45,7 +45,7 @@ var BaseListView = BaseView.extend({
 	className:'list_section',
 	parent:'div#main',
 	template:'#general_list',
-	events: {'click .item_title': 'expandDetail',
+	events: {'click .item_title:not(.new)': 'expandDetail',
 			'click #previous': 'previousPage',
 			'click #next': 'nextPage'
 			},
@@ -74,8 +74,7 @@ var BaseListView = BaseView.extend({
 				view.parent=div;
 				view.render();
 				//animation
-				var h= div.height();
-				div.height(0).animate({height:h});
+				animateHeight(div, 0);
 			}
 		}
 	},
@@ -109,7 +108,8 @@ var DetailView = BaseView.extend({
 		      "click #r2b_save_btn": 'saveModel'},
 	
 	renderEdit: function() {
-		this.$el.html(compileTemplate(this.templateEdit)(this.model.attributes))
+		this.$el.html(compileTemplate(this.templateEdit)(this.model.attributes));
+		formsAPI.initForm(this);
 		$(this.parent).html(this.$el).height('auto') ;
 		
 		this.$el.find('div.r2b_form').append($('<div>').html('View').addClass('r2b_top_form_btn')
@@ -124,8 +124,9 @@ var DetailView = BaseView.extend({
 	saveModel: function() {
 		var dirty=this.model.updateFromForm(this.$el)
 		if (dirty) {
-			//not very efficient - should just rerender current item only
+			
 			this.model.save();
+			//not very efficient - should just rerender current item only
 			this.model.once('sync', function() {app.currentView.reRender()});
 			
 			
@@ -198,7 +199,87 @@ var BooksListView=BaseListView.extend({
 	}
 });
 
+var NewView = BaseView.extend({
+	templateItem:'#new_list_item',
+	tagName:'div',
+	className:'item_content',
+	initialize: function() {
+		this.model.on('rejected', function(errors){displayErrors(root, errors)});
+		BaseView.prototype.initialize.apply(this, arguments);
+	},
+	render: function() {
+		if ($('li.list_item.new').length>0) return;
+		var item=$(this.templateItem({name: this.model.modelName}));
+		$('div.list_section ul').prepend(item);
+		var form= compileTemplate('#r2b_template_'+this.model.modelName.toLowerCase())(this.model.attributes);
+		this.$el.html(form);
+		this.$el.find('div.r2b_form').append($('<div>').html('Save').addClass('r2b_form_btn')
+				.attr('id', 'r2b_save_btn'));
+		this.$el.appendTo(item);
+		//animation
+		animateHeight(this.$el,0);
+		
+	
+	},
+	events: {'click #r2b_save_btn': 'saveNew'},
+	saveNew: function() {
+		this.$el.height('auto');
+		var view= app.currentView
+		var root=this.$el
+		clearErrors(root);
+		this.model.updateFromForm(this.$el)
+		this.model.save();
+		//not very efficient - should just rerender current item only
+		this.model.once('sync', function() {
+			view.model.unshift(this)
+			app.currentView.reRender()});
+	}
+	
+})
+
 //supporting functions for views
+
+animateHeight=function(el, from, to) {
+	if (to=== undefined || to==='auto') {
+		to=el.height();
+	};
+	if (from==='auto') {
+		from=el.height();
+	}
+	el.height(from).animate({height:to}, function(){
+		if (to=== undefined || to==='auto') {
+			el.height('auto')
+		}
+	});
+	
+};
+
+var displayErrors=function(root, errors) {
+	var list = root.find('ul.r2b_errors');
+	for (name in errors) {
+		var label =root.find('label[for="id_'+name+'"]').addClass('error');
+		var messages=errors[name]
+		if (! _.isArray(messages)) {
+			messages=[messages]
+		};
+		for (var i=0;i<messages.length;i+=1) {
+			var item=$('<li>').text(name+ ': '+messages[i]);
+			list.append(item);
+		};
+	}
+}
+
+var clearErrors= function(root) {
+	root.find('ul.r2b_errors').empty();
+	root.find('label.error').removeClass('error');
+}
+
+var addNew= function() {
+	var model=new app.currentView.model.model();
+	var view=new NewView({model:model});
+	view.render();
+	
+}
 
 var toggleMainMenu = function(item) {
 	$('#main_tabs li').removeClass('selected');
@@ -288,6 +369,7 @@ var App=Backbone.Router.extend({
 
 var app=new App();
 app.doSearch=doSearch;
+app.addNew=addNew;
 return app;
 }();
 
@@ -305,6 +387,7 @@ if (! Backbone.history.fragment) {
 $('#publishers_tab').click(function(evt) {booksApp.navigate('publisher', {trigger:true})});
 $('#authors_tab').click(function(evt) {booksApp.navigate('author', {trigger:true})});
 $('#books_tab').click(function(evt) {booksApp.navigate('book', {trigger:true})});
+$('#add_new').click(function(evt) {booksApp.addNew()});
 
 $('.search-field').keypress(function(event) {
 	if ( event.which == 13 ) {
