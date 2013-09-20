@@ -20,6 +20,7 @@ from django.utils.encoding import smart_text
 from django.utils.datastructures import SortedDict
 from django.utils.html import escape
 from rest2backbone.widgets import DynamicSelect
+from django.core import validators
 
 class ModelSerializer(serializers.ModelSerializer):
     def get_related_field(self, model_field, related_model, to_many):
@@ -78,6 +79,22 @@ class ConcatField(fields.CharField):
 class EscapedCharField(fields.CharField):
     def to_native(self, value):
         return escape(fields.CharField.to_native(self, value))
+
+class FloatField(fields.FloatField):
+    default_error_messages = {
+        'invalid': _("'%s' value must be a float."),
+        'max_value': _('Ensure this value is less than or equal to %(limit_value)s.'),
+        'min_value': _('Ensure this value is greater than or equal to %(limit_value)s.'),
+    }
+    
+    def __init__(self, max_value=None, min_value=None, *args, **kwargs):
+        self.max_value, self.min_value = max_value, min_value
+        super(FloatField, self).__init__(*args, **kwargs)
+
+        if max_value is not None:
+            self.validators.append(validators.MaxValueValidator(max_value))
+        if min_value is not None:
+            self.validators.append(validators.MinValueValidator(min_value))
             
     
 class IndexMixin(object):
@@ -205,6 +222,7 @@ class PublisherView(ViewSetWithIndex):
 class BookSerializer(ModelSerializer):
     author_names=serializers.RelatedField(source='authors', many=True, label=_("Authors"))
     num_pages=serializers.IntegerField(min_value=1, max_value="99999", required=False, label=_('Pages'))
+    rating=FloatField(min_value=0, max_value=10, required=False, label=_('Rating'))
     publisher=serializers.PrimaryKeyRelatedField(label=_("Publisher"), required=True, widget=DynamicSelect())
     authors=serializers.ManyPrimaryKeyRelatedField(label=_("Authors"), required=True, widget=DynamicSelect())
     class Meta:

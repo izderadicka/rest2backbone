@@ -36,6 +36,46 @@ $.ajaxSetup({
 var restAPI= function() {
 	var api={};
 	
+	var validators = {
+			required: function(value) {
+				if (! value) {
+					return gettext('Value is required');
+				}
+			},
+			minmax: function(value, min, max) {
+				if (!value && value!== 0) {
+					return
+				}
+				// we take numbers only
+				value=+value;
+				if (isNaN(value)) {
+					return
+				}
+				
+				if ((min||min===0)  && value < min) {
+					return gettext('Value is smaller then required minimum:')+min
+				}
+				if ((max||max===0)  && value > max) {
+					return gettext('Value is geater then required maximum:')+max
+				}
+			},
+			minmaxLength: function(value, min, max) {
+				if( ! value || value.length===undefined) {
+					return
+				}
+				
+				if ((min||min===0) && value.length< min) {
+					return gettext('Length of value is smaller then required minimum:')+min
+				}
+				
+				if ((max||max===0)  && value.length> max) {
+					return gettext('Length of value is greater then required maximum:')+max
+				}
+			},
+	};
+	
+	
+	
 	 api.BaseCollection=Backbone.Collection.extend({
 		
 		constructor: function() {
@@ -140,7 +180,42 @@ var restAPI= function() {
 		},
 		
 		validate: function(attrs) {
+			var allErrors={}
+			for (var name in this.fields) {
+				var errors=[]
+				addError=function(err) {
+					if (!err) { 
+						return;
+					}
+					if (!_.isArray(err)) {
+						err=[err]
+					}
+					errors=errors.concat(err);
+				}
+				var field=this.fields[name],
+				value=attrs[name];
+				
+				if (field.required) {
+					addError(validators.required(value))
+				}
+				
+				if (field.min_value||field.min_value===0||field.max_value||field.max_value===0) {
+					addError(validators.minmax(value, field.min_value, field.max_value))
+				}
+				
+				if (field.min_length||field.min_length===0||field.max_length||field.max_length===0) {
+					addError(validators.minmaxLength(value, field.min_length, field.max_length))
+				}
+				
+				
+				if (errors.length>0) {
+					allErrors[name]=errors;
+				}
+			}
 			
+			if (_.size(allErrors)>0) {
+				return allErrors
+			}
 		},
 		
 		updateFromForm: function(rootElem) {
