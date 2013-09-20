@@ -137,12 +137,18 @@ class DynamicSelect(DynamicWidget):
         return mark_safe(u'\n'.join(output))
     
     def render_javascript(self, name, attrs, field):
+        empty_option=''
+        if not field.required:
+            empty_option="select.append($('<option>');"
+        
         js="""function(e, obj) {
 var select=$(this),
 value=obj.value,
 progress=$('<div>').addClass('r2b_progress-small').insertAfter(select),
 index=new restAPI[select.attr('data-index-name')];
 select.empty();
+"""+empty_option+\
+"""
 index.on('reset', function() {
 index.forEach(function(item) {
 var o=$('<option>').attr('value', item.id).html(item.get('name'));

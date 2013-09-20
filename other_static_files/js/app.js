@@ -122,9 +122,10 @@ var DetailView = BaseView.extend({
 	},
 	
 	saveModel: function() {
-		var dirty=this.model.updateFromForm(this.$el)
+		var dirty=this.model.updateFromForm(this.$el),
+		root=this.$el
 		if (dirty) {
-			
+			this.model.once('rejected', function(errors){displayErrors(root, errors)});
 			this.model.save();
 			//not very efficient - should just rerender current item only
 			this.model.once('sync', function() {app.currentView.reRender()});
@@ -204,22 +205,22 @@ var NewView = BaseView.extend({
 	tagName:'div',
 	className:'item_content',
 	initialize: function() {
-		this.model.on('rejected', function(errors){displayErrors(root, errors)});
 		BaseView.prototype.initialize.apply(this, arguments);
+		
 	},
 	render: function() {
 		if ($('li.list_item.new').length>0) return;
 		var item=$(this.templateItem({name: this.model.modelName}));
-		$('div.list_section ul').prepend(item);
+		$('div.list_section > ul.list').prepend(item);
 		var form= compileTemplate('#r2b_template_'+this.model.modelName.toLowerCase())(this.model.attributes);
 		this.$el.html(form);
+		formsAPI.initForm(this);
 		this.$el.find('div.r2b_form').append($('<div>').html('Save').addClass('r2b_form_btn')
 				.attr('id', 'r2b_save_btn'));
 		this.$el.appendTo(item);
 		//animation
 		animateHeight(this.$el,0);
 		
-	
 	},
 	events: {'click #r2b_save_btn': 'saveNew'},
 	saveNew: function() {
@@ -227,7 +228,8 @@ var NewView = BaseView.extend({
 		var view= app.currentView
 		var root=this.$el
 		clearErrors(root);
-		this.model.updateFromForm(this.$el)
+		this.model.updateFromForm(this.$el);
+		this.model.once('rejected', function(errors){displayErrors(root, errors)});
 		this.model.save();
 		//not very efficient - should just rerender current item only
 		this.model.once('sync', function() {
