@@ -58,7 +58,7 @@ class InputMixin(object):
                 self.attrs['max']=unicode(field.max_value)
         
         dummy_value=mark_safe('<%%= %s %%>' % name)
-        return self.render(name, dummy_value, attrs=None)
+        return self.render(name, dummy_value, attrs)
     
 class CheckBoxMixin(object):
     def render_template(self, name, attrs=None, field=None):

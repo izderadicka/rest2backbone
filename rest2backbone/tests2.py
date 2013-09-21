@@ -38,9 +38,15 @@ class TestForms(test.TestCase):
         from urls import router
         ff=FormFactory(router) 
         html=ff.get('Book').render()
-        re.search('<script>.*function', html)
+        self.assertTrue(re.search('<script>.*function', html, re.DOTALL))
 
-
+    def test_id(self):
+        from urls import router
+        ff=FormFactory(router) 
+        html=ff.get('Book').render()
+        print html
+        self.assertTrue(re.search(r'<input .*? id="id_publication_date.*?/>', html))
+        
     def test_select(self):
         from urls import router
         ff=FormFactory(router)
