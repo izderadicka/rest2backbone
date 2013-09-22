@@ -75,6 +75,7 @@ div.list_item_bar {
     border: 1px solid lightgray;
     border-radius: 6px 6px 6px 6px;
     margin-bottom: 5px;
+    position: relative;
 }
 
 .item_content {
@@ -92,6 +93,7 @@ span.item_title {
     margin-top: 10px;
     min-height: 2em;
     display:block;
+    margin-right: 45px;
     
 }
 
@@ -240,4 +242,14 @@ div.r2b_progress-small {
 }
 .r2b_field select {
     float: left;
+}
+
+.list_item div.item_delete {
+    background: url("/static/img/delete.png") no-repeat scroll 0 0 transparent;
+    height: 30px;
+    position: absolute;
+    right: 8px;
+    top: 9px;
+    width: 30px;
+    cursor: pointer;
 }
