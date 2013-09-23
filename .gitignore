@@ -2,3 +2,5 @@
 /django_filters
 /rest_framework
 *~
+/htmlcov
+/.coverage

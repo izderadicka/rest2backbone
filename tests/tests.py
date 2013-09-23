@@ -12,6 +12,7 @@ from django.test.utils import override_settings
 from sample_app.models import Author
 
 from tests2 import  *
+from tests_js import *
 
 def find_pos(list, name):
     for i in range(len(list)):
