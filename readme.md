@@ -22,8 +22,8 @@ Key features:
 - A sample application - showing how it should be used.
 
 
-How to use
-==========
+Quick Start
+===========
 
 [Get code from GitHub](https://github.com/izderadicka/rest2backbone/archive/master.zip)
 
@@ -33,6 +33,9 @@ Get dependencies - django, djangorestframwork
 
 `pip -r requirements.pip`
 
+Load sample data
+`./manage.py loaddata sample_data.json`
+
 Run server
 
 `./manage.py runserver`
@@ -41,7 +44,8 @@ In browser open http://localhost:8000/
 
 In browser (Firefox/Chrome) open developer tools - to see API requests to server - on load/change of models
 
-Look into `sample_app` directory to see how to use it.
+Look into `sample_app` directory to see how to use.
+
 
 More Info
 =========
