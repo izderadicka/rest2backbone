@@ -4,7 +4,7 @@ Created on Sep 9, 2013
 @author: ivan
 '''
 import unittest
-import api
+import rest2backbone.api as api
 from rest2backbone.forms import FormFactory
 from rest_framework import test as api_test
 from rest_framework import settings as api_settings

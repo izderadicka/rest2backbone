@@ -161,7 +161,7 @@ div.progress_wheel {
     width: 230px;
 }
 
-div.r2b_form_ro, div.r2b_form {
+div.edit_form, div.view_only {
     border: medium dotted lightblue;
     margin: 10px 20px;
     padding: 12px 15px 10px;
