@@ -1,7 +1,7 @@
 Intro
 =====
 
-This project aims to made easier to develop django application with REST API and rich clients, that are using this API via *backbone.js*.  In django it uses *djangorestframework*  to quickly define RESTful API.
+This project aims to made easier to develop django application with REST API and rich clients, that are using this API via **[backbone.js](http://backbonejs.org)**.  In django it uses **[djangorestframework](http://django-rest-framework.org)**  to quickly define RESTful API.
 
 Key features:
 -------------
