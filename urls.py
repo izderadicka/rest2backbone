@@ -1,12 +1,12 @@
 from django.conf.urls import patterns, include, url
-from django.views.generic import TemplateView
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 from django.views.generic.base import TemplateView
 admin.autodiscover()
 
-from rest2backbone.resources import AuthorView, BookView, PublisherView, IndexedRouter
+from sample_app.resources import AuthorView, BookView, PublisherView
+from rest2backbone.resources import IndexedRouter
 router=IndexedRouter(trailing_slash=False)
 router.register('author', AuthorView)
 router.register('book', BookView)

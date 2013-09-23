@@ -124,7 +124,9 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'rest2backbone',
-    'rest_framework'
+    'rest_framework',
+    'tests',
+    'sample_app'
 )
 
 # A sample logging configuration. The only tangible logging

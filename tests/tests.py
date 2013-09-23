@@ -5,13 +5,11 @@ Created on Sep 9, 2013
 '''
 import unittest
 import rest2backbone.api as api
-from rest2backbone.forms import FormFactory
 from rest_framework import test as api_test
 from rest_framework import settings as api_settings
-import types
 import json
 from django.test.utils import override_settings
-from models import Author
+from sample_app.models import Author
 
 from tests2 import  *
 
