@@ -347,7 +347,7 @@ var restAPI = function() {
 					continue;
 				}
 				var input = $el.find('input[name="' + key + '"], select[name="'+ 
-						key + '"]');
+						key + '"], textarea[name="'+key+'"]');
 				if (input.length < 1) {
 					throw "Input for attribute " + key + " is missing";
 				}

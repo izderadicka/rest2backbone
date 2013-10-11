@@ -70,7 +70,9 @@ var formsAPI= function () {
 					this.$el.html(view.template(this.model));
 					this.model.forEach(function(item) {
 						view.$el.find('ul').append(
-								view.templateItem({title: view.getTitle(item), id:item.id}));
+								view.templateItem({title: view.getTitle(item), 
+												  id:item.id, 
+												  attributes:item.attributes}));
 					});
 					return this;
 				},

@@ -35,8 +35,8 @@ class Field(StrAndUnicode):
                     setattr(self, new_atr, getattr(ser_field, atr))
             else:
                 setattr(self, new_atr, None)
-        # widget must be supplied        
-        assert self.widget
+        # widget must be supplied  for not writable fields    
+        assert self.widget or self.read_only
     
     @property
     def id(self):
@@ -128,7 +128,6 @@ formsAPI.forms['%(form_id)s']['%(field_id)s']=%(script)s;"""
             res=[]
             res.append(u'<script type="text/template" id="r2b_template_%s">'% self.name.lower())
             t=render_to_string(self.template_name, {'form':self})
-            unicode(str(t))
             res.append(t)
             res.append(u'</script>')
             js=[]

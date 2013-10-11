@@ -50,12 +50,15 @@ Look into `sample_app` directory to see how to use.
 More Info
 =========
 
-More info will be on [my web](http://zderadicka.eu) 
+More info will be on [project page on my web](http://zderadicka.eu/projects/python/rest2backbone/) 
  
 
 Versions:
 ========
-0.1 - first release
+1.0 - first release
+1.0.1 - minor fixes 
+	added support for Textarea widget in templates
+
 
 License:
 =========

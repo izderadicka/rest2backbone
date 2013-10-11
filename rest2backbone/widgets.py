@@ -79,6 +79,12 @@ class SelectMixin(object):
             js='<%% if ( %s == "%s") { print(" selected")}%%>' %( self.name, val)
         return u'<option value="%s"%s>%s</option>' % (
            val, js, conditional_escape(force_unicode(option_label)))
+        
+class TextAreaMixin(object):
+    def render_template(self, name, attrs=None, field=None):
+        dummy_value=mark_safe('<%%= %s %%>' % name)
+        return self.render(name, dummy_value, attrs)
+        
     
 class DummyMixin (object):
     def render_template(self, name, attrs=None, field=None):
@@ -87,7 +93,8 @@ class DummyMixin (object):
 #defines patches tuples of Original_Widget_Class,  Patch_Mixin_Class    
 PATCHES=[(widgets.Input, InputMixin),
           (widgets.CheckboxInput, CheckBoxMixin),
-          (widgets.Select, SelectMixin)]
+          (widgets.Select, SelectMixin),
+          (widgets.Textarea, TextAreaMixin)]
 
 class DynamicWidget(widgets.Widget):
     
