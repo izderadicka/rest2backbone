@@ -11,18 +11,19 @@ from django.utils.safestring import mark_safe
 from django.utils.encoding import StrAndUnicode
 from django.template.loader import render_to_string
 import widgets
+import json
 
 
 class Field(StrAndUnicode):
     _attrs=['read_only', 'fields', 'label', 'widget', 'required', 'choices', 'regexp', 'help_text', 
             ('type_label', 'type'), 'min_value', 'max_value', 'many']
-    def __init__(self, form, name, ser_field, auto_id="id_%s", ro_class='r2b_field_value_ro'):
+    def __init__(self, form, name, ser_field, ro_class='r2b_field_value_ro'):
         self.name=name
         self.form=form
         self.ro_class=ro_class
         self.force_ro=False
-        self.auto_id=auto_id
         self._rendered=False
+        self.auto_id="id_%s" # do not change forms-api.js depends on it
         self.widget_attrs={'id':self.id}
         for atr in self._attrs:
             new_atr=atr
@@ -43,7 +44,7 @@ class Field(StrAndUnicode):
         return  self.auto_id%self.name.lower()          
     def _get_widget(self, widget):
         if isinstance(widget, type):
-            widget=()
+            widget=widget()
         else:
             widget=copy.deepcopy(widget)
         #monkey patch to adapt to template rendering
@@ -68,9 +69,11 @@ class Field(StrAndUnicode):
     def render_js(self):
         if not self._rendered:
             raise RuntimeError('Has not been rendered yet')
-        if hasattr(self.widget,'render_javascript'):
-            return self.widget.render_javascript(self.name, self.widget_attrs, self)
-        
+        if hasattr(self.widget,'js_options'):
+            cls=self.widget.js_widget or self.widget.__class__.__name__
+            opts=self.widget.js_options(self.name, self.widget_attrs, self) or {}
+            return cls, json.dumps(opts)
+        return None, None
     
     def __unicode__(self):
         if self.force_ro:
@@ -122,8 +125,8 @@ class Form(object):
             return mark_safe('\n'.join(res))
         finally:    
             self.force_ro=False
-    JS_TEMPLATE="""if (!formsAPI.forms['%(form_id)s']) { formsAPI.forms['%(form_id)s']={} };
-formsAPI.forms['%(form_id)s']['%(field_id)s']=%(script)s;"""       
+    JS_TEMPLATE0="""if (!formsAPI.forms['%(form_id)s']) { formsAPI.forms['%(form_id)s']={} };"""
+    JS_TEMPLATE="""formsAPI.forms['%(form_id)s']['%(field_id)s']={cls:%(cls)s, options:%(opts)s};"""       
     def render(self):
             res=[]
             res.append(u'<script type="text/template" id="r2b_template_%s">'% self.name.lower())
@@ -131,10 +134,15 @@ formsAPI.forms['%(form_id)s']['%(field_id)s']=%(script)s;"""
             res.append(t)
             res.append(u'</script>')
             js=[]
+            zero_line=False
             for f in self.fields:
-                script=f.render_js()
-                if script: 
-                    script=self.JS_TEMPLATE% {'script':script, 'field_id':f.id, 'form_id':self.id} 
+                cls,opts=f.render_js()
+                if cls: 
+                    if not zero_line:
+                        js.append(self.JS_TEMPLATE0 % {'form_id':self.id})
+                        zero_line=True
+                    script=self.JS_TEMPLATE% {'cls':cls, 'opts':opts, 
+                                    'field_id':f.id, 'form_id':self.id} 
                     js.append(script)
             if js:
                 res.append('<script>')

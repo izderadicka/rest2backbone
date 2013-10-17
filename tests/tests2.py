@@ -38,7 +38,7 @@ class TestForms(test.TestCase):
         from urls import router
         ff=FormFactory(router) 
         html=ff.get('Book').render()
-        self.assertTrue(re.search('<script>.*function', html, re.DOTALL))
+        self.assertTrue(re.search('<script>.*options', html, re.DOTALL))
 
     def test_id(self):
         from urls import router
@@ -56,7 +56,7 @@ class TestForms(test.TestCase):
         publisher=book.get('publisher')
         publisher_html=publisher.render()
         print publisher_html
-        self.assertTrue(publisher_html.find('PublisherIndex')>0)
+        self.assertTrue(publisher_html.find('r2b_dynamic')>0)
         authors=book.get('authors')
         authors_html=authors.render()
         self.assertTrue(authors_html.find('select')>0)

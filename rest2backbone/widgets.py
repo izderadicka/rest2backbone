@@ -97,31 +97,44 @@ PATCHES=[(widgets.Input, InputMixin),
           (widgets.Textarea, TextAreaMixin)]
 
 class DynamicWidget(widgets.Widget):
+    js_widget=None #Name of JS Widget class in not specified is same as class name
     
+    def __init__(self, *args, **kwargs):
+        super(DynamicWidget, self).__init__(*args,**kwargs)
+        self.attrs['class']= 'r2b_dynamic' if not self.attrs.has_key('class') else self.attrs['class']+' r2b_dynamic'
+        
     def render_template(self, name,  attrs , field):
-        """ renders js template using underscore.js syntax"""
+        """ renders js template in HTML  (plus underscore.js syntax)
+"""
         raise NotImplemented
     
-    def render_javascript(self, name, attrs, field):
-        """ Should render any JS to enable dynamic behaviour
-JS is call by refresh event, should return code for anonymous function:
-function(value) {
-//this is bind to input/select element with class r2b_dynamic and name 
-}
-
-"""
-        return None
+    def js_options(self, name, attrs, field):
+        """ returns  options -  dictionary of values, will be passed to 
+constructor of widget instance (must be serializable to JSON)
+        """
+        return None, None
         
 
 class DynamicSelect(DynamicWidget):
+    js_widget='formsAPI.DynamicSelect'
     def __init__(self, *args, **kwargs):
         
         self.index_model_js=kwargs.pop('index_model_js') if kwargs.has_key('index_model_js') else None
         super(DynamicSelect, self).__init__(*args,**kwargs)
         
-        
+    
     def render_template(self, name,  attrs , field):
         multiple=field.many
+        final_attrs = self.build_attrs(attrs, name=name)
+        if multiple:
+            final_attrs['multiple']=''
+        output = [u'<select%s>' % flatatt(final_attrs)]
+        if not field.required and not multiple:
+            output.append(u'<option></option>')
+        output.append(u'</select>')
+        return mark_safe(u'\n'.join(output))
+    
+    def _get_model_js(self, field):
         model_js=self.index_model_js 
         if not model_js:
             try:
@@ -130,44 +143,11 @@ class DynamicSelect(DynamicWidget):
                 pass
         if not model_js:
             raise ValueError('Cannot detect related model name')
-        attrs['data-index-name']=model_js
-        final_attrs = self.build_attrs(attrs, name=name)
-        if multiple:
-            final_attrs['multiple']=''
-        final_attrs['class']= 'r2b_dynamic' if not final_attrs.has_key('class') else final_attrs['class']+' r2b_dynamic_select'
-        output = [u'<select%s>' % flatatt(final_attrs)]
-        if not field.required and not multiple:
-            output.append(u'<option></option>')
-            
-        output.append(u'</select>')
-        #output.append(u'<script>alert("'+final_attrs['id']+'")</script>')
-        return mark_safe(u'\n'.join(output))
+        return model_js
     
-    def render_javascript(self, name, attrs, field):
-        empty_option=''
-        if not field.required:
-            empty_option="select.append($('<option>');"
-        
-        js="""function(e, obj) {
-var select=$(this),
-value=obj.value,
-progress=$('<div>').addClass('r2b_progress-small').insertAfter(select),
-index=new restAPI[select.attr('data-index-name')];
-select.empty();
-"""+empty_option+\
-"""
-index.on('reset', function() {
-index.forEach(function(item) {
-var o=$('<option>').attr('value', item.id).html(item.get('name'));
-if (_.isArray(value) && (value.indexOf(item.id)>-1 || value.indexOf(item.id.toString())>-1)  
-  || item.id==value) { o.attr('selected', '') };
-o.appendTo(select);
-});
-progress.remove();
-}); 
-index.fetch({reset:true});
-}      
-"""
-        return js
+    def js_options(self, name, attrs, field):
+        index_model_js=self._get_model_js(field)
+        return {'indexModel':index_model_js,
+                'required': field.required}  
     
         

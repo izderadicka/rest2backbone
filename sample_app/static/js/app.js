@@ -12,7 +12,7 @@ var booksApp = function() {
 				events : $.extend ( {
 					'click .item_title:not(.new)' : 'expandDetail',
 					'click .item_delete': 'deleteItem'
-				},api.BaseListView.prototype.events),
+				},formsAPI.BaseListView.prototype.events),
 				
 				expandDetail : function(evt) {
 					var title = $(evt.currentTarget), item = title
@@ -64,7 +64,7 @@ var booksApp = function() {
 			var view= formsAPI.compileTemplate(this.templateView)(this.model.attributes),
 			edit=formsAPI.compileTemplate(this.templateEdit)(this.model.attributes);
 			this.$el.html(this.template({form_ro:view, form:edit}));
-			formsAPI.initForm(this);
+			this.initForm();
 			return this;
 		},
 
@@ -76,9 +76,7 @@ var booksApp = function() {
 		},
 		
 		formHidden: function() {
-			if (this.model.changedAttributes()){
-			alert('Some changes are not saved!');
-			}
+			
 		},
 		
 		switchForm: function(ro) {

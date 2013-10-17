@@ -58,6 +58,8 @@ Versions:
 1.0 - first release
 1.0.1 - minor fixes 
 	added support for Textarea widget in templates
+1.1 - revamped dynamic widgets to more flexible and extensible model
+    - save -   use PATCH when possible
 
 
 License:
