@@ -167,7 +167,7 @@ var booksApp = function() {
 					'#r2b_template_' + this.model.modelName.toLowerCase())(
 					this.model.attributes);
 			this.$el.html(form);
-			formsAPI.initForm(this);
+			this.initForm();
 			this.$el.find('div.r2b_form').append(
 					$('<div>').html('Save').addClass('r2b_form_btn').attr('id',
 							'r2b_save_btn'));
