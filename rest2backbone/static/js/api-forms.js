@@ -247,7 +247,7 @@ var formsAPI= function () {
 				throw "Don't know how to get value for " + this.elem.prop('tagName').toUpperCase();
 			}
 			if (this.elem.attr('type') === "checkbox") {
-					return input.prop('checked');
+					return this.elem.prop('checked');
 				}
 			return this.elem.val();
 	
