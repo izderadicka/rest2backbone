@@ -8,6 +8,7 @@ from django.forms.util import flatatt
 from django.utils.html import escape, conditional_escape
 from django.utils.encoding import force_unicode
 from rest_framework.templatetags.rest_framework import add_class
+import copy
 """ Django forms widgets will not work for rendering templates
 Here we define adapter mixins - that have method render_template.
 This mixins will be rendered patched into existinng instances of widgets
@@ -113,15 +114,27 @@ class DynamicWidget(widgets.Widget):
 constructor of widget instance (must be serializable to JSON)
         """
         return None, None
+class DynamicRelatedWidget(DynamicWidget): 
+    
+    def __init__(self, *args, **kwargs):
+        self.model_js=kwargs.pop('model_js') if kwargs.has_key('model_js') else None
+        super(DynamicRelatedWidget, self).__init__(*args,**kwargs)  
+        
+    def _get_model_js(self, field, suffix=''):
+        model_js=self.model_js 
+        if not model_js:
+            try:
+                model_js=field.choices.queryset.model._meta.object_name+suffix
+            except AttributeError:
+                pass
+        if not model_js:
+            raise ValueError('Cannot detect related model name')
+        return model_js 
+        
         
 
-class DynamicSelect(DynamicWidget):
+class DynamicSelect(DynamicRelatedWidget):
     js_widget='formsAPI.DynamicSelect'
-    def __init__(self, *args, **kwargs):
-        
-        self.index_model_js=kwargs.pop('index_model_js') if kwargs.has_key('index_model_js') else None
-        super(DynamicSelect, self).__init__(*args,**kwargs)
-        
     
     def render_template(self, name,  attrs , field):
         multiple=field.many
@@ -134,20 +147,26 @@ class DynamicSelect(DynamicWidget):
         output.append(u'</select>')
         return mark_safe(u'\n'.join(output))
     
-    def _get_model_js(self, field):
-        model_js=self.index_model_js 
-        if not model_js:
-            try:
-                model_js=field.choices.queryset.model._meta.object_name+'Index'
-            except AttributeError:
-                pass
-        if not model_js:
-            raise ValueError('Cannot detect related model name')
-        return model_js
-    
     def js_options(self, name, attrs, field):
-        index_model_js=self._get_model_js(field)
+        index_model_js=self._get_model_js(field, 'Index')
         return {'indexModel':index_model_js,
                 'required': field.required}  
+        
+        
+class DynamicEditor(DynamicRelatedWidget):
+    js_widget='formsAPI.DynamicEditor'
+    
+    def render_template(self, name, attrs, field):
+        final_attrs = self.build_attrs(attrs) 
+        output=['<div%s>'% flatatt(final_attrs)]
+        output.append('<div class="r2b_ro_value"></div>')
+        output.append(u'<input type="hidden" name="%(name)s" value="<%%= %(name)s%%>">' % {'name':name})
+        output.append('<div class="edit_btn small_btn"></div>')
+        output.append('</div>')
+        return mark_safe('\n'.join(output))
+        
+    def js_options(self, name, attrs, field):
+        opts= {'name':name, 'relatedModel':self._get_model_js(field)}
+        return opts
     
         

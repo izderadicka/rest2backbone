@@ -10,6 +10,7 @@ import copy
 from django.utils.safestring import mark_safe
 from django.utils.encoding import StrAndUnicode
 from django.template.loader import render_to_string
+from django.forms import widgets as forms_widgets
 import widgets
 import json
 
@@ -55,6 +56,9 @@ class Field(StrAndUnicode):
                     
     def render_ro(self):
         return mark_safe(u'<span id="id_'+self.name+'" class="'+self.ro_class+'"><%= '+self.name+' %></span>')
+    
+    def hidden(self):
+        return isinstance(self.widget, forms_widgets.HiddenInput) 
     
     def label_tag(self):
         req=u' class="required"' if self.required else ''

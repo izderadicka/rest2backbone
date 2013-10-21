@@ -2,9 +2,11 @@
 <div id="{{form.id}}" class="r2b_form">
 <div><ul class="r2b_errors"></ul></div>
 {% for f in form.fields %}
+{% if f.hidden %}{{f}}{%else%}
 <div class="r2b_field_row">
 {{f.label_tag|add_class:"r2b_field_label"}}
 <div class="r2b_field">{{f}}</div>
 </div>
+{%endif%}
 {%endfor%}
 </div>

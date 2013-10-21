@@ -257,8 +257,10 @@ var restAPI = function() {
 			return defs;
 		},
 
-		validate : function(attrs) {
+		validate : function(attrs, options) {
+		
 			var allErrors = {},
+			prevErrors=options.errors || {},
 			addError = function(err) {
 				if (!err) {
 					return;
@@ -269,6 +271,9 @@ var restAPI = function() {
 				errors = errors.concat(err);
 			};
 			for ( var name in this.fields) {
+				if (_.has(prevErrors,name)) {
+					allErrors[name]=prevErrors[name];
+				} else {
 				var errors = [];
 				var field = this.fields[name], value = attrs[name];
 				if (field.required) {
@@ -293,6 +298,7 @@ var restAPI = function() {
 
 				if (errors.length > 0) {
 					allErrors[name] = errors;
+				}
 				}
 			}
 
