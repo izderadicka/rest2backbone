@@ -56,10 +56,18 @@ More info will be on [project page on my web](http://zderadicka.eu/projects/pyth
 Versions:
 ========
 1.0 - first release
-1.0.1 - minor fixes 
+
+1.0.1 - minor fixes, 
 	added support for Textarea widget in templates
-1.1 - revamped dynamic widgets to more flexible and extensible model
-    - save -   use PATCH when possible
+
+1.1 - revamped dynamic widgets to more flexible and extensible model,
+    save - use PATCH when possible
+
+1.2 - more refactoring of dynamic widgets,
+DynamicEditor (edit related object in place),
+small fixes
+
+1.2.1 - setup script
 
 
 License:
