@@ -199,16 +199,19 @@ var formsAPI= function () {
 			root = this.$el;
 			this.clearErrors();
 			if (! _.isEmpty(data.changed)) {
-				this.model.once('sync', function() {
-					if (view.afterSave) {
-						view.afterSave();
-					}
-				});
+				this.model.off('sync',  this.callAfterSave, this);
+				this.model.once('sync', this.callAfterSave, this);
 				this.model.save(data.changed, {patch:true, validate:true, errors:data.errors});
 			} else if (! _.isEmpty(data.errors)){
 				this.displayErrors(data.errors);
 			} else {
 				this.displayErrors({'':[gettext('No data entered/changed!')]})
+			}
+		},
+		
+		callAfterSave: function() {
+			if (this.afterSave) {
+				this.afterSave()
 			}
 		},
 		

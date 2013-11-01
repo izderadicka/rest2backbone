@@ -97,7 +97,7 @@ PATCHES=[(widgets.Input, InputMixin),
           (widgets.Select, SelectMixin),
           (widgets.Textarea, TextAreaMixin)]
 
-class DynamicWidget(widgets.Widget):
+class DynamicWidget(widgets.TextInput):
     js_widget=None #Name of JS Widget class in not specified is same as class name
     
     def __init__(self, *args, **kwargs):
