@@ -101,6 +101,11 @@ class DynamicWidget(widgets.TextInput):
     js_widget=None #Name of JS Widget class in not specified is same as class name
     
     def __init__(self, *args, **kwargs):
+        
+        if kwargs.has_key('options'):
+            self.options=kwargs.pop('options')
+        else:
+            self.options={}
         super(DynamicWidget, self).__init__(*args,**kwargs)
         self.attrs['class']= 'r2b_dynamic' if not self.attrs.has_key('class') else self.attrs['class']+' r2b_dynamic'
         
@@ -113,7 +118,10 @@ class DynamicWidget(widgets.TextInput):
         """ returns  options -  dictionary of values, will be passed to 
 constructor of widget instance (must be serializable to JSON)
         """
-        return None, None
+        
+        return self.options if hasattr(self.options) else {}
+    
+    
 class DynamicRelatedWidget(DynamicWidget): 
     
     def __init__(self, *args, **kwargs):
@@ -149,8 +157,10 @@ class DynamicSelect(DynamicRelatedWidget):
     
     def js_options(self, name, attrs, field):
         index_model_js=self._get_model_js(field, 'Index')
-        return {'indexModel':index_model_js,
-                'required': field.required}  
+        opts= {'indexModel':index_model_js,
+                'required': field.required}
+        opts.update(self.options)
+        return opts
         
         
 class DynamicEditor(DynamicRelatedWidget):
@@ -167,6 +177,7 @@ class DynamicEditor(DynamicRelatedWidget):
         
     def js_options(self, name, attrs, field):
         opts= {'name':name, 'relatedModel':self._get_model_js(field)}
+        opts.update(self.options)
         return opts
     
         

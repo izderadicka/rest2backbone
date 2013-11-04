@@ -193,18 +193,52 @@ var formsAPI= function () {
 			return {changed:changes, errors:errors};
 		}, 
 			
-		saveModel : function() {
-			var data = this.readForm(),
-			view = this,
-			root = this.$el;
+		saveModel : function(event, options) {
+			
+			var data,
+			view=this;
 			this.clearErrors();
+			if (options && options.deferredSaves && options.deferredSaves.length>0) {
+				_.each(options.deferredSaves, function(item){item.save()});
+				$.when.apply($,options.deferredSaves).done(function(){
+					data = view.readForm();
+					view._doSave(data, options);
+				});
+			} else {
+				data = this.readForm();
+				return this._doSave(data, options);
+			}
+		},
+			
+		 _doSave: function(data, options) {
+			var view = this,
+			root = this.$el;
 			if (! _.isEmpty(data.changed)) {
+				if (options && options.deferred) {
+					var valid=this.model.set(data.changed, {errors:data.errors, validate:true})
+					if (valid) {
+						this.callAfterSave()
+						var promise=$.Deferred();
+						promise.save=function() {
+							view.model.once('sync', function(model) {
+								promise.resolve(model);
+							});
+							view.model.once('error', function(model,xhr){
+								promise.reject(model,xhr);
+							});
+							view.model.save({},{validate:false});
+							return this;
+						};
+						return promise
+					} 
+				} else {
 				this.model.off('sync',  this.callAfterSave, this);
 				this.model.once('sync', this.callAfterSave, this);
 				this.model.save(data.changed, {patch:true, validate:true, errors:data.errors});
+				}
 			} else if (! _.isEmpty(data.errors)){
 				this.displayErrors(data.errors);
-			} else {
+			} else if (!(options && options.deferredSaves && options.deferredSaves.length>0)) {
 				this.displayErrors({'':[gettext('No data entered/changed!')]})
 			}
 		},
@@ -241,7 +275,16 @@ var formsAPI= function () {
 		
 	});
 	
-	
+	api.getWidget= function(name, ctx) {
+		var input=$('#id_'+name+':not(.r2b_field_value_ro)', ctx);
+		if (input.length<1) return null;
+		var widget= input.data('widget');
+		if (! widget) {
+			widget=new api.Widget(input);
+			
+		}
+		return widget;
+	};
 	
 	api.Widget=function(selector, opts) {
 		this.options=_.extend({}, opts);
@@ -252,7 +295,7 @@ var formsAPI= function () {
 	}
 	};
 	
-	// these are properties that should not be overriden
+	// these are properties that should not be overridden
 	var widgetBase={_isInput:function() {
 		return  _.contains(['INPUT', 'SELECT', 'TEXTAREA'], this.elem.prop('tagName').toUpperCase());
 	},
@@ -330,15 +373,6 @@ var formsAPI= function () {
 					this.elem.on(evt, el, _.bind(fn,this));
 				}
 				}
-		},
-		
-		getPeerWidget: function(name) {
-			var input=$('#id_'+name+':not(.r2b_field_value_ro)');
-			var widget= input.data('widget');
-			if (! widget) {
-				widget=new api.Widget(input);
-				
-			}
 		}
 		});
 				
@@ -448,7 +482,7 @@ var formsAPI= function () {
 			$('.r2b_ro_value').html(repr);
 		},
 		
-		openEditor:function() {
+		openEditor:function(event, newData) {
 			var widget=this,
 			popup=$('.r2b_widget_popup', this.elem);
 			if (popup.length<1) {
@@ -460,6 +494,11 @@ var formsAPI= function () {
 				$('input', widget.elem).val(this.model.id);
 				widget.updateReadOnly();
 				popup.remove();
+				},
+				render: function() {
+					var attrs= newData || this.model.attributes;
+					this.$el.html(this.template(attrs));
+					this.initForm();
 				}
 			}),
 			view=new Form({model:this.data});
@@ -467,7 +506,19 @@ var formsAPI= function () {
 			doneBtn=$('<div>').addClass('r2b_done_btn r2b_small_btn');
 			popup.append(closeBtn).append(doneBtn);
 			closeBtn.click(function() {popup.remove();});
-			doneBtn.click(function() {view.saveModel();});
+			doneBtn.click(function() {
+				var def=view.saveModel(null, {deferred:widget.options.deferredSave});
+				if (def) {
+					widget.deferredSave=def;
+					def
+					.then(function(){
+						$('input', widget.elem).val(widget.data.id);
+					})
+					.then(function(){
+						widget.deferredSave=null;
+					})
+				}
+				});
 			view.render();
 			popup.append(view.$el);
 			} else {

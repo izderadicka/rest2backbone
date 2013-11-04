@@ -68,8 +68,10 @@ DynamicEditor (edit related object in place),
 small fixes
 
 1.2.1 - setup script
+
 1.2.2 - small fixes in forms-api
 
+1.2.3 -   added possibility to defer save in FormView,   DynamicEditor widget
 
 License:
 =========
