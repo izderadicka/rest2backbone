@@ -161,13 +161,12 @@ var restAPI = function() {
 			}
 			Backbone.Collection.apply(this, arguments);
 		},
-
-		// initialize: function() {
-		// this.on('error', function(model, xhr, options) {
-		// alert('Server Error on Collection: '+xhr.status + ' -
-		// '+xhr.statusText);
-		// });
-		// },
+		initialize: function() {
+			this.on('error', function(model, xhr, options) {
+				if (xhr.errorHandled) return;
+				alert('Server Error on Collection: '+xhr.status + ' -'+xhr.statusText);
+			});
+		},
 
 		url : function() {
 			var qs = [];
@@ -232,15 +231,20 @@ var restAPI = function() {
 	api.BaseModel = Backbone.Model.extend({
 
 		initialize : function() {
+			var model=this;
 			this.on('error', function(model, xhr, options) {
+				xhr.errorHandled=true;
 				if (xhr.status == 400 && xhr.responseJSON &&
 						!$.isEmptyObject(xhr.responseJSON)) {
 					this.trigger('rejected', xhr.responseJSON);
 				} else {
+					model.ajaxFailed=true;
 					alert('Server Error on Model: ' + xhr.status + ' - ' + 
 							xhr.statusText);
 				}
 			});
+			
+			this.on('sync', function(){model.ajaxFailed=false;});
 		},
 
 		defaults : function() {

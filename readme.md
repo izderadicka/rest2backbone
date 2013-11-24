@@ -73,6 +73,8 @@ small fixes
 
 1.2.3 -   added possibility to defer save in FormView,   DynamicEditor widget
 
+1.2.4 -  some changes to JS -   better handling of errors when server is not responding
+
 License:
 =========
 [BSD license](http://opensource.org/licenses/BSD-3-Clause) (same as Django)

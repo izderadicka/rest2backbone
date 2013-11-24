@@ -119,7 +119,7 @@ var formsAPI= function () {
 				
 				if (api.forms[form_id] && api.forms[form_id][id]) {
 					var def=api.forms[form_id][id];
-					var opts=_.extend({}, def.options, {formId:form_id, view:view})
+					var opts=_.extend({}, def.options, {formId:form_id, view:view});
 					widget=new def.cls(el, opts);
 					el.data('widget', widget);
 					
@@ -198,8 +198,9 @@ var formsAPI= function () {
 			var data,
 			view=this;
 			this.clearErrors();
+			this.model.onlyRelatedChanged=false;
 			if (options && options.deferredSaves && options.deferredSaves.length>0) {
-				_.each(options.deferredSaves, function(item){item.save()});
+				_.each(options.deferredSaves, function(item){item.save();});
 				$.when.apply($,options.deferredSaves).done(function(){
 					data = view.readForm();
 					view._doSave(data, options);
@@ -210,14 +211,14 @@ var formsAPI= function () {
 			}
 		},
 			
-		 _doSave: function(data, options) {
+		_doSave: function(data, options) {
 			var view = this,
 			root = this.$el;
 			if (! _.isEmpty(data.changed)) {
 				if (options && options.deferred) {
-					var valid=this.model.set(data.changed, {errors:data.errors, validate:true})
+					var valid=this.model.set(data.changed, {errors:data.errors, validate:true});
 					if (valid) {
-						this.callAfterSave()
+						this.callAfterSave();
 						var promise=$.Deferred();
 						promise.save=function() {
 							view.model.once('sync', function(model) {
@@ -229,7 +230,7 @@ var formsAPI= function () {
 							view.model.save({},{validate:false});
 							return this;
 						};
-						return promise
+						return promise;
 					} 
 				} else {
 				this.model.off('sync',  this.callAfterSave, this);
@@ -238,14 +239,19 @@ var formsAPI= function () {
 				}
 			} else if (! _.isEmpty(data.errors)){
 				this.displayErrors(data.errors);
-			} else if (!(options && options.deferredSaves && options.deferredSaves.length>0)) {
-				this.displayErrors({'':[gettext('No data entered/changed!')]})
+			} else if (options && options.deferredSaves && options.deferredSaves.length>0)  {
+				this.model.onlyRelatedChanged=true;
+				this.callAfterSave();
+			} else if (this.model.ajaxFailed) {
+				this.model.save().done(function(){view.callAfterSave();});
+			} else {
+				this.displayErrors({'':[gettext('No data entered/changed!')]});
 			}
 		},
 		
 		callAfterSave: function() {
 			if (this.afterSave) {
-				this.afterSave()
+				this.afterSave();
 			}
 		},
 		
@@ -485,8 +491,12 @@ var formsAPI= function () {
 		openEditor:function(event, newData) {
 			var widget=this,
 			popup=$('.r2b_widget_popup', this.elem);
-			if (popup.length<1) {
-			if (!this.data ) return;
+			if (popup.length>0) {
+				popup.remove();
+				if (!newData) return;
+			} 
+			
+			if (!this.data && !newData) return;
 			popup= $('<div>').addClass('r2b_widget_popup').appendTo(this.elem);
 			var Form = formsAPI.FormView.extend({
 				template:'#r2b_template_'+this.options.relatedModel.toLowerCase(),
@@ -516,14 +526,12 @@ var formsAPI= function () {
 					})
 					.then(function(){
 						widget.deferredSave=null;
-					})
+					});
 				}
 				});
 			view.render();
 			popup.append(view.$el);
-			} else {
-				popup.remove();
-			}
+			
 			
 		}
 	});
