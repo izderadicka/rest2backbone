@@ -75,6 +75,8 @@ small fixes
 
 1.2.4 -  some changes to JS -   better handling of errors when server is not responding
 
+1.2.5 -  fixed to work with django 1.5+ and newer django-rest-framework
+
 License:
 =========
 [BSD license](http://opensource.org/licenses/BSD-3-Clause) (same as Django)

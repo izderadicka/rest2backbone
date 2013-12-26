@@ -45,7 +45,7 @@ class TestForms(test.TestCase):
         ff=FormFactory(router) 
         html=ff.get('Book').render()
         print html
-        self.assertTrue(re.search(r'<input .*? id="id_publication_date.*?/>', html))
+        self.assertTrue(re.search(r'<input .*?id="id_publication_date.*?/>', html))
         
     def test_select(self):
         from urls import router

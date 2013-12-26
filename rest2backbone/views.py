@@ -12,9 +12,12 @@ class restApi(TemplateView):
     template_name='rest2backbone/api.js'
     
     def render_to_response(self, context, **response_kwargs):
-        if (not context.get('params') and not context.get('params').get('router')):
+        #django 1.4 compatibility 
+        if context.get('params'):
+            context=context['params']
+        if (not context.get('router')):
             raise ValueError('router param missing')
-        maker=ModelMaker(context['params']['router'], context['params'].get('url_prefix'))
+        maker=ModelMaker(context['router'], context.get('url_prefix'))
         context['models']=SafeString(maker.toJS()) 
         return TemplateView.render_to_response(self, context, mimetype='text/javascript')
     

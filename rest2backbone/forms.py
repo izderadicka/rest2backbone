@@ -31,7 +31,7 @@ class Field(StrAndUnicode):
             if isinstance(atr, (tuple, list)):
                 atr, new_atr=atr[0], atr[1]
             if hasattr(ser_field, atr):
-                if atr in ('widget',):
+                if atr in ('widget',) and getattr(ser_field,atr):
                     setattr(self, new_atr, self._get_widget(getattr(ser_field, atr)))
                 else:
                     setattr(self, new_atr, getattr(ser_field, atr))
