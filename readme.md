@@ -1,11 +1,13 @@
 Intro
 =====
 
-This project aims to made easier to develop django application with REST API and rich clients, that are using this API via **[backbone.js](http://backbonejs.org)**.  In django it uses **[djangorestframework](http://django-rest-framework.org)**  to quickly define RESTful API.
+This project aims to made easier to develop django application with REST API and rich clients, 
+that are using this API via **[backbone.js](http://backbonejs.org)**.  
+In Django it uses **[djangorestframework](http://django-rest-framework.org)**  to quickly define RESTful API.
 
 Key features:
 -------------
-- Generates models and collection definitions in JS from resources and models definitions in django.
+- Generates models and collection definitions in JS from resources and models definitions in Django.
 - Backbone Models should contain (as per models/resources definitions in Django):
  * default values
  * validations
@@ -18,7 +20,7 @@ Key features:
   (also read only forms)
 - Forms can:
  * update validation result to form
- * save modified form to server (via rest API - using Backbone models and colections).
+ * save modified form to server (via rest API - using Backbone models and collections).
 - A sample application - showing how it should be used.
 
 

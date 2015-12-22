@@ -4,3 +4,9 @@
 *~
 /htmlcov
 /.coverage
+/pip-selfcheck.json
+/bin
+/lib
+/local
+/man
+/include

@@ -3,9 +3,9 @@ Created on Sep 9, 2013
 
 @author: ivan
 '''
-
+import six
 from rest_framework import serializers, viewsets, permissions, exceptions,\
-    routers, fields, six
+    routers, fields
 from django.utils.translation import gettext_lazy as _
 
 from django.db.models import  Q
@@ -16,7 +16,7 @@ from rest_framework.generics import strict_positive_int
 from django.http import Http404
 from django.core.paginator import InvalidPage
 from django.utils.encoding import smart_text
-from django.utils.datastructures import SortedDict
+from collections import OrderedDict
 from django.utils.html import escape
 from rest2backbone.widgets import DynamicSelect
 from django.core import validators
@@ -58,7 +58,7 @@ class ConcatField(fields.CharField):
         
         
     def to_native(self, instance):
-        vals=SortedDict()
+        vals=OrderedDict()
         for name in self.fields:
             try:
                 vals[name]= self._to_string(getattr(instance, name))

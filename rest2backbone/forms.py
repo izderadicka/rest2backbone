@@ -5,17 +5,17 @@ Created on Sep 14, 2013
 '''
 
 from api import RouterAdapter
-from django.utils.datastructures import SortedDict
+from collections import  OrderedDict
 import copy
 from django.utils.safestring import mark_safe
-from django.utils.encoding import StrAndUnicode
+from django.utils.encoding import python_2_unicode_compatible
 from django.template.loader import render_to_string
 from django.forms import widgets as forms_widgets
 import widgets
 import json
 
-
-class Field(StrAndUnicode):
+@python_2_unicode_compatible
+class Field(object):
     _attrs=['read_only', 'fields', 'label', 'widget', 'required', 'choices', 'regexp', 'help_text', 
             ('type_label', 'type'), 'min_value', 'max_value', 'many']
     def __init__(self, form, name, ser_field, ro_class='r2b_field_value_ro'):
@@ -79,7 +79,7 @@ class Field(StrAndUnicode):
             return cls, json.dumps(opts)
         return None, None
     
-    def __unicode__(self):
+    def __str__(self):
         if self.force_ro:
             return self.render_ro()
         else:
@@ -91,7 +91,7 @@ class Form(object):
     def __init__(self, name, serializer_class, template_name=None, template_name_ro=None, auto_id="id_form_%s"):
         self.name=name
         self.auto_id=auto_id
-        self._fields= SortedDict()
+        self._fields= OrderedDict()
         fields=serializer_class().fields
         for f in fields:
             self.add_field(f, fields[f])

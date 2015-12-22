@@ -4,7 +4,7 @@ Created on Sep 16, 2013
 @author: ivan
 '''
 from __future__ import unicode_literals
-from django.forms.util import flatatt
+from django.forms.utils import flatatt
 from django.utils.html import escape, conditional_escape
 from django.utils.encoding import force_unicode
 from rest_framework.templatetags.rest_framework import add_class
