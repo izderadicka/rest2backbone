@@ -41,7 +41,7 @@ Get dependencies - django, djangorestframwork
 Load sample data
 ```
 rm sqlite.db
-./manage.py loaddata
+./manage.py migrate
 ./manage.py loaddata sample_data.json
 ```
 
