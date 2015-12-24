@@ -51,7 +51,7 @@ class BookSerializer(ModelSerializer):
     num_pages=serializers.IntegerField(min_value=1, max_value="99999", required=False, label=_('Pages'))
     rating=FloatField(min_value=0, max_value=10, required=False, label=_('Rating'))
     publisher=serializers.PrimaryKeyRelatedField(label=_("Publisher"), required=True, widget=DynamicSelect())
-    authors=serializers.ManyPrimaryKeyRelatedField(label=_("Authors"), required=True, widget=DynamicSelect())
+    authors=serializers.PrimaryKeyRelatedField(label=_("Authors"), required=True, widget=DynamicSelect(), many=True)
     class Meta:
         model=Book
         fields=('id', 'title', 'author_names', 'authors', 'genre', 'rating', 'num_pages', 'publisher', 'publication_date', 'publication_time')

@@ -11,7 +11,7 @@ from django.db import models
 
 class Publisher(models.Model):
     name = models.CharField(max_length=30, verbose_name=_('Name'))
-    international=models.BooleanField( verbose_name=_('International'))
+    international=models.BooleanField( verbose_name=_('International'), default=False)
     address = models.CharField(max_length=50, blank=True, null=True, verbose_name=_('Street Address'))
     city = models.CharField(max_length=60, blank=True, null=True , verbose_name=_('City'))
     state_province = models.CharField(max_length=30, blank=True, null=True,  verbose_name=_('State/Province'))

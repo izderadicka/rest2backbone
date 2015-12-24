@@ -19,6 +19,6 @@ class restApi(TemplateView):
             raise ValueError('router param missing')
         maker=ModelMaker(context['router'], context.get('url_prefix'))
         context['models']=SafeString(maker.toJS()) 
-        return TemplateView.render_to_response(self, context, mimetype='text/javascript')
+        return TemplateView.render_to_response(self, context, content_type='text/javascript')
     
     

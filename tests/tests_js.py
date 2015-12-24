@@ -6,7 +6,7 @@ Created on Sep 23, 2013
 import unittest
 import os
 import subprocess
-from django import test
+import django.contrib.staticfiles.testing as testing
 import tempfile
 
 curr_dir=os.path.split(__file__)[0]
@@ -19,7 +19,7 @@ class Phantom():
         p=subprocess.Popen([self.cmd, os.path.join(curr_dir, script_file)], shell=False)
         return p.wait()
         
-class TestJS(test.LiveServerTestCase):
+class TestJS(testing.StaticLiveServerTestCase):
     fixtures=('test_data.json', )
 
 

@@ -1,9 +1,12 @@
 Intro
 =====
+**Due to essential changes between djangorest framework versions this version works only with djangorest framework 2 and Django < 1.9.**
 
 This project aims to made easier to develop django application with REST API and rich clients, 
 that are using this API via **[backbone.js](http://backbonejs.org)**.  
 In Django it uses **[djangorestframework](http://django-rest-framework.org)**  to quickly define RESTful API.
+
+Due to essential changes between djangorest framework this version works only with djangorest framework 2 and Django < 1.9.
 
 Key features:
 -------------
@@ -33,10 +36,14 @@ Extract
 
 Get dependencies - django, djangorestframwork
 
-`pip -r requirements.pip`
+`pip -r requirements.txt`
 
 Load sample data
-`./manage.py loaddata sample_data.json`
+```
+rm sqlite.db
+./manage.py loaddata
+./manage.py loaddata sample_data.json
+```
 
 Run server
 
