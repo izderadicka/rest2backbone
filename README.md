@@ -1,6 +1,6 @@
 Intro
 =====
-** PROJECT IS NOT MAINTAINED ANY MORE **
+**PROJECT IS NOT MAINTAINED ANY MORE**
 
 **Due to essential changes between djangorest framework versions this version works only with djangorest framework 2 and Django < 1.9.**
 
